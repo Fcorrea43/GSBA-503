@@ -1,133 +1,116 @@
 # GSBA-503
-Object Detection Comparison: Faster R-CNN vs RetinaNet
+# Object Detection Comparison: Faster R-CNN vs RetinaNet
 
-This project compares two popular deep learning object detection models — Faster R-CNN and RetinaNet — using PyTorch’s pretrained COCO weights. The goal is to evaluate model performance across a collection of real-world images by measuring number of detected objects, confidence scores, brightness, and inference time.
+This project compares two widely used deep learning object detection models, Faster R-CNN and RetinaNet, using PyTorch’s pretrained COCO weights. The purpose is to evaluate model performance across a set of real-world images by measuring the number of detected objects, confidence scores, brightness, and inference time.
 
-This work was completed as part of a take-home image analytics assignment. 
+This work was completed as part of a take-home image analytics assignment.
 
-Take Home assigment
+---
 
-Project Overview
+## Project Overview
 
-The code loads two pretrained models:
+The code loads and evaluates two pretrained object detection models:
 
-Faster R-CNN (ResNet-50 + FPN) — a two-stage detector prioritizing accuracy
+- Faster R-CNN (ResNet-50 + FPN): a two-stage detector focused on accuracy
+- RetinaNet (ResNet-50 + FPN): a one-stage detector optimized for speed and confidence
 
-RetinaNet (ResNet-50 + FPN) — a one-stage detector prioritizing speed and confidence
+For each input image, both models produce predictions. The script records the following metrics:
 
-Each image undergoes the same preprocessing and is evaluated by both models.
-For every image/model pair we collect:
+- Number of detected objects
+- Average detection confidence
+- Average image brightness
+- Inference time (seconds)
 
-Number of detected objects
+Outputs are stored in a Pandas dataframe for further analysis.
 
-Average confidence score
+---
 
-Average brightness
+## Project Structure
 
-Inference time (seconds)
+```
+├── images/                         # Folder containing the input images
+├── detect.py                       # Main script for running detection
+├── results.csv                     # Exported results table
+├── Take Home assignment.html       # Exported HTML notebook (assignment write-up)
+└── charts/                         # Optional folder for generated plots
+```
 
-All results are saved into a Pandas dataframe for later analysis and visualization.
+---
 
-📂 Project Structure
-├── images/                # Folder containing input images
-├── results.csv            # Model outputs (detections & metrics)
-├── charts/                # Generated plots (optional)
-├── Take Home assignment.html  # Full report (exported notebook)
-└── detect.py              # Main evaluation script
+## How the Code Works
 
-How It Works
-1. Load Models
+### 1. Load Pretrained Models
+```python
 model_frcnn = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
 model_retinanet = torchvision.models.detection.retinanet_resnet50_fpn(weights="DEFAULT")
+```
 
+### 2. Move Models to CPU or GPU
+The script automatically detects whether CUDA is available.
 
-Both models run in eval mode and use GPU if available.
+### 3. Image Preprocessing
+Each image is converted into a PyTorch tensor using `transforms.ToTensor()`.
 
-2. Preprocess Images
-transform = transforms.ToTensor()
+### 4. Inference Loop
+For every image in the `images/` directory, the script:
 
+- Loads and transforms the image
+- Performs inference with both models
+- Extracts bounding boxes, confidence scores, and object counts
+- Measures inference time
+- Computes average brightness
 
-Images are converted to PyTorch tensors.
+### 5. Save Results
+All metrics are saved into a dataframe and exported as `results.csv`.
 
-3. Run Inference
+---
 
-For each image:
+## Key Findings
 
-Transform
+- Faster R-CNN consistently detected more objects per image, showing stronger overall accuracy.
+- RetinaNet produced fewer detections but achieved slightly higher average confidence and faster runtime.
+- Both models performed worse on very dark or very bright images, indicating that lighting conditions influence detection quality.
 
-Move to device
+---
 
-Run detection
+## Example Results Table
 
-Filter predictions by confidence
+| image        | model        | num_objects | avg_score | brightness | time_sec |
+|--------------|--------------|-------------|-----------|------------|----------|
+| img7.jpeg    | Faster R-CNN | 4           | 0.75      | 109.39     | 0.816    |
+| img7.jpeg    | RetinaNet    | 1           | 0.82      | 109.39     | 0.632    |
+| ...          | ...          | ...         | ...       | ...        | ...      |
 
-Measure time
+---
 
-Compute brightness
+## How to Run the Script
 
-4. Store Results
+1. Clone the repository.
+2. Install dependencies, including PyTorch and Torchvision.
+3. Place your image files inside the `images/` folder.
+4. Run:
 
-Results are appended into a Pandas dataframe and exported to CSV or visualized.
-
-Key Findings
-
-Faster R-CNN detects more objects across nearly all images, making it more thorough.
-
-RetinaNet runs faster and often produces higher average confidence, but detects fewer objects.
-
-Models perform worse on very bright or very dark images, suggesting lighting strongly impacts detection.
-
-Example Output Table
-image	model	num_objects	avg_score	brightness	time_sec
-img 7.jpeg	Faster R-CNN	4	0.75	109.39	0.816
-img 7.jpeg	RetinaNet	1	0.83	109.39	0.632
-...	...	...	...	...	...
-📈 Visualizations
-
-This project can generate useful charts:
-
-Average objects detected per model
-
-Average confidence per model
-
-Inference time comparison
-
-If you'd like, I can add the code to automatically save these charts to the repo.
-
-▶️ How to Run
-
-Clone the repository
-
-Install PyTorch + Torchvision
-
-Add your images to images/
-
-Run:
-
+```
 python detect.py
+```
 
+5. Review the generated `results.csv` file.
 
-View results in results.csv
+---
 
-Dependencies
+## Dependencies
 
-Python 3.10+
+- Python 3.10 or higher
+- PyTorch
+- Torchvision
+- NumPy
+- Pandas
+- Pillow
 
-PyTorch
+---
 
-Torchvision
+## Author
 
-NumPy
+Fernando Correa  
+MSBA, University of San Diego
 
-Pandas
-
-Pillow
-
-License
-
-MIT License (or specify your preferred license)
-
-Author
-
-Fernando Correa
-MSBA — University of San Diego
